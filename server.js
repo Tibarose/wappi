@@ -9,11 +9,9 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Store clients by instance ID
 const clients = {};
 const qrCodes = {};
 
-// Initialize a new WhatsApp client
 async function initializeClient(instanceId) {
   if (clients[instanceId]) {
     return { success: true, message: 'Client already exists' };
@@ -59,10 +57,9 @@ async function initializeClient(instanceId) {
   return { success: true, message: 'Client initialized' };
 }
 
-// Endpoint to create a new instance
 app.post('/instance', async (req, res) => {
   const { apiKey } = req.body;
-  if (!apiKey || apiKey !== 'your-static-api-key') {
+  if (!apiKey || apiKey !== process.env.API_KEY) {
     return res.status(401).json({ error: 'Invalid API key' });
   }
   const instanceId = uuidv4();
@@ -70,11 +67,10 @@ app.post('/instance', async (req, res) => {
   res.json({ instanceId, apiKey });
 });
 
-// Endpoint to get QR code
 app.get('/qr/:instanceId', (req, res) => {
   const { instanceId } = req.params;
   const { apiKey } = req.query;
-  if (!apiKey || apiKey !== 'your-static-api-key') {
+  if (!apiKey || apiKey !== process.env.API_KEY) {
     return res.status(401).json({ error: 'Invalid API key' });
   }
   if (qrCodes[instanceId]) {
@@ -84,11 +80,10 @@ app.get('/qr/:instanceId', (req, res) => {
   }
 });
 
-// Endpoint to send message
 app.post('/send/:instanceId', async (req, res) => {
   const { instanceId } = req.params;
   const { apiKey, number, message } = req.body;
-  if (!apiKey || apiKey !== 'your-static-api-key') {
+  if (!apiKey || apiKey !== process.env.API_KEY) {
     return res.status(401).json({ error: 'Invalid API key' });
   }
   if (!number || !message) {
@@ -107,11 +102,10 @@ app.post('/send/:instanceId', async (req, res) => {
   }
 });
 
-// Endpoint to logout
 app.post('/logout/:instanceId', async (req, res) => {
   const { instanceId } = req.params;
   const { apiKey } = req.body;
-  if (!apiKey || apiKey !== 'your-static-api-key') {
+  if (!apiKey || apiKey !== process.env.API_KEY) {
     return res.status(401).json({ error: 'Invalid API key' });
   }
   const client = clients[instanceId];
